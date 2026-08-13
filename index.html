@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>格蘭教育機構</title>
+  <meta name="description" content="整合人事、教學、學習與企業資源的平台入口">
+
+  <style>
+    :root {
+      --gram-navy: #07172d;
+      --gram-gold: #e8c66a;
+
+      /* 桌布圖片：改這一行即可 */
+      --desktop-wallpaper: url("images/20.png");
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      overflow: hidden;
+      color: #fff;
+      background: var(--gram-navy);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+    }
+
+    button, select { font: inherit; }
+
+    /* 固定桌布，不切換、不滑動 */
+    .desktop {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(2, 9, 20, .18), rgba(2, 9, 20, .18)),
+        var(--desktop-wallpaper) center / cover no-repeat;
+    }
+
+    .top-brand {
+      position: fixed;
+      top: 26px;
+      left: 38px;
+      z-index: 10;
+      display: block;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, .55);
+    }
+
+    /* 左上「格蘭企業入口網」超連結 */
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .brand-link:hover,
+    .brand-link:focus-visible {
+      opacity: .88;
+      outline: none;
+    }
+
+    .brand-line {
+      width: 7px;
+      height: 43px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ffe8a5, #ad8127);
+      box-shadow: 0 0 20px rgba(232, 198, 106, .42);
+    }
+
+    .brand-kicker {
+      margin: 0 0 3px;
+      color: var(--gram-gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .19em;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: clamp(20px, 2vw, 29px);
+      font-weight: 900;
+      letter-spacing: .05em;
+    }
+
+    /* ============================================================
+       右上角 Facebook／YouTube 超連結
+       ============================================================ */
+    .social-links {
+        position: fixed;
+        top: 26px;       /* 越大越往下 */
+        right: 38px;     /* 越大越往左 */
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 10px;       /* FB 與 YT 的間距 */
+    }
+
+    .social-link {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 50%;
+      background: rgba(4, 17, 37, 0.66);
+      cursor: pointer;
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .social-link img {
+      display: block;
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .social-link:hover,
+    .social-link:focus-visible {
+      border-color: #e8c66a;
+      background: rgba(21, 45, 77, 0.88);
+      outline: none;
+    }
+    /* ============================================================
+   首頁廣告輪播區
+   ============================================================ */
+.ad-carousel {
+  position: absolute;
+
+  /* ★ 廣告欄上下左右位置 */
+  top: 120px;       /* 數字越大越往下 */
+  left: 50%;       /* 數字越大越往右 */
+
+  z-index: 6;
+transform: translateX(-50%);
+  /* ★ 廣告欄大小 */
+  width: 686px;
+  height: 180px;
+
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .30);
+  border-radius: 18px;
+  background: rgba(5, 17, 37, .55);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, .35);
+}
+/* 允許水平拖曳，保留頁面垂直滑動 */
+.ad-viewport {
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ad-carousel.is-dragging .ad-viewport {
+  cursor: grabbing;
+}
+
+.ad-slide,
+.ad-slide img {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.ad-slide img {
+  pointer-events: none;
+}
+.ad-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ad-slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-100%);
+}
+
+.ad-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.ad-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  /* cover：填滿廣告欄，可能裁切少量邊緣 */
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 滑鼠碰到廣告時稍微變亮 */
+.ad-slide:hover img {
+  filter: brightness(1.06);
+}
+
+/* 下方圓點 */
+.ad-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 11px;
+  z-index: 10;
+
+  display: flex;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+
+.ad-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .78);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .28);
+  cursor: pointer;
+}
+
+.ad-dot.is-active {
+  width: 25px;
+  border-radius: 999px;
+  border-color: var(--gram-gold);
+  background: var(--gram-gold);
+}
+    /* ============================================================
+       11 個桌面捷徑：3、3、3、2
+
+       捲動功能保留，但把右側／旁邊的捲軸外觀隱藏：
+       - 滑鼠滾輪仍可使用
+       - 觸控板仍可使用
+       - 手機觸控滑動仍可使用
+       ============================================================ */
+    .desktop-shortcuts {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: grid;
+      grid-template-columns: repeat(3, 210px);
+      gap: 24px 28px;
+      max-height: calc(100vh - 125px);
+      padding: 8px 12px 28px 8px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+
+      /* Firefox：隱藏捲軸，但保留捲動 */
+      scrollbar-width: none;
+
+      /* 舊版 Edge／IE：隱藏捲軸，但保留捲動 */
+      -ms-overflow-style: none;
+    }
+
+    /* Chrome／Edge／Safari：隱藏捲軸，但保留捲動 */
+    .desktop-shortcuts::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+
+    .shortcut {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 210px;
+      min-height: 175px;
+      padding: 12px 10px 14px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      color: #fff;
+      background: transparent;
+      cursor: pointer;
+      text-align: center;
+      text-shadow: 0 2px 5px rgba(0,0,0,.95), 0 0 10px rgba(0,0,0,.7);
+      transition: background-color .14s ease, border-color .14s ease;
+    }
+
+    .shortcut:hover,
+    .shortcut:focus-visible {
+      border-color: rgba(255,255,255,.35);
+      background: rgba(40, 100, 165, .38);
+      outline: none;
+    }
+
+    .shortcut:active {
+      background: rgba(42, 116, 195, .52);
+    }
+
+    .shortcut-image {
+      display: grid;
+      place-items: center;
+      width: 190px;
+      height: 110px;
+      margin-bottom: 7px;
+      overflow: hidden;
+      border-radius: 5px;
+      background: rgba(255,255,255,.93);
+      box-shadow: 0 5px 16px rgba(0,0,0,.30);
+    }
+
+    .shortcut-image img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .shortcut-title {
+      display: block;
+      width: 100%;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .shortcut-subtitle {
+      display: block;
+      width: 100%;
+      margin-top: 2px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .desktop-note {
+      position: fixed;
+      right: 30px;
+      bottom: 24px;
+      z-index: 4;
+      margin: 0;
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      letter-spacing: .05em;
+      text-shadow: 0 3px 12px rgba(0,0,0,.75);
+      pointer-events: none;
+    }
+
+    /* 校務系統校區選擇視窗 */
+    .school-dialog {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(1, 6, 14, .72);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .18s ease, visibility .18s ease;
+    }
+
+    .school-dialog.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .school-dialog-card {
+      width: min(500px, 100%);
+      padding: 27px;
+      border: 1px solid rgba(255,255,255,.20);
+      border-radius: 20px;
+      background: #0a2348;
+      box-shadow: 0 28px 80px rgba(0,0,0,.52);
+    }
+
+    .school-dialog-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 19px;
+    }
+
+    .school-dialog-title { margin: 0; font-size: 26px; }
+
+    .school-dialog-copy {
+      margin: 7px 0 0;
+      color: rgba(255,255,255,.64);
+      font-size: 13px;
+    }
+
+    .dialog-close {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(255,255,255,.07);
+      cursor: pointer;
+      font-size: 22px;
+    }
+
+    .dialog-close:hover,
+    .dialog-close:focus-visible {
+      border-color: var(--gram-gold);
+      background: rgba(232,198,106,.16);
+      outline: none;
+    }
+
+    .school-select {
+      width: 100%;
+      height: 54px;
+      padding: 0 16px;
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 12px;
+      color: #fff;
+      background: #10315e;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .school-select:focus {
+      border-color: var(--gram-gold);
+      box-shadow: 0 0 0 3px rgba(232,198,106,.14);
+    }
+
+    .school-select option {
+      color: #fff;
+      background: #10315e;
+    }
+
+    .school-help {
+      margin: 12px 2px 0;
+      color: rgba(255,255,255,.48);
+      font-size: 11px;
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+
+      .desktop {
+        min-height: 100vh;
+        height: auto;
+        overflow: visible;
+      }
+
+      .top-brand {
+        position: relative;
+        top: auto;
+        left: auto;
+        padding: 24px 125px 8px 20px;
+      }
+
+      .social-links {
+        top: 22px;
+        right: 18px;
+      }
+
+      .social-link {
+        width: 39px;
+        height: 39px;
+        font-size: 12px;
+      }
+
+      .desktop-shortcuts {
+        position: relative;
+        top: auto;
+        left: auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+        max-height: none;
+        padding: 18px;
+        overflow: visible;
+      }
+
+      .shortcut {
+        width: 100%;
+        min-height: 122px;
+      }
+
+      .shortcut-image {
+        width: min(138px, 100%);
+      }
+
+      .desktop-note { display: none; }
+    }
+
+    @media (max-width: 420px) {
+      .desktop-shortcuts { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="desktop">
+    <header class="top-brand">
+      <!-- =========================================================
+           ★★★【網址設定 1：格蘭企業入口網】★★★
+           在 VS Code 搜尋「網址設定 1」即可找到這裡。
+           請修改下方 href="https://www.gram.com.tw/" 的網址。
+           ========================================================= -->
+      <a
+        class="brand-link"
+        href="https://www.gram.com.tw/"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="前往格蘭英語網站"
+      >
+        <span class="brand-line" aria-hidden="true"></span>
+        <div>
+          <p class="brand-kicker">GRAM EDUCATION CENTER</p>
+          <h1 class="brand-title">格蘭教育機構</h1>
+        </div>
+      </a>
+    </header>
+
+    <nav class="social-links" aria-label="社群連結">
+      <!-- =========================================================
+           ★★★【網址設定 2：Facebook】★★★
+           在 VS Code 搜尋「網址設定 2」即可找到這裡。
+           把下方 href="#" 改成完整的 Facebook 網址。
+           例如：https://www.facebook.com/你的粉專
+           ========================================================= -->
+      <a
+        class="social-link"
+        href="https://www.facebook.com/GRAM1980/"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Facebook"
+        aria-label="Facebook"
+      >
+        <img src="images/facebook.png" alt="Facebook">
+    </a>
+
+      <!-- =========================================================
+           ★★★【網址設定 3：YouTube】★★★
+           在 VS Code 搜尋「網址設定 3」即可找到這裡。
+           把下方 href="#" 改成完整的 YouTube 網址。
+           例如：https://www.youtube.com/@你的頻道
+           ========================================================= -->
+      <a
+        class="social-link"
+        href="https://www.youtube.com/@gramenglish"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="YouTube"
+        aria-label="YouTube"
+      >
+      <img src="images/youtube.png" alt="YouTube">
+    </a>
+    </nav>
+      <!-- =========================================================
+     ★★★ 首頁廣告輪播區 ★★★
+     修改 href：點擊廣告後前往的網址
+     修改 src：廣告圖片路徑
+     建議三張圖片使用相同尺寸，例如 1200 × 360
+     ========================================================= -->
+     
+<section class="ad-carousel" id="adCarousel" aria-label="活動廣告">
+  <div class="ad-viewport">
+
+    <!-- 廣告 1 -->
+    <a
+      class="ad-slide is-active"
+      href="https://audio.gram1980.com/MusicCenter/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="開啟第一則活動"
+    >
+      <img src="img/002.jpg" alt="第一則活動廣告">
+    </a>
+
+    <!-- 廣告 2 -->
+    <a
+      class="ad-slide"
+      href="https://www.gram.com.tw/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="開啟第二則活動"
+    >
+      <img src="img/001.jpg" alt="第二則活動廣告">
+    </a>
+
+    <!-- 廣告 3 -->
+    <a
+      class="ad-slide"
+      href="https://op.gram.tw/readingpen/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="開啟第三則活動"
+    >
+      <img src="img/003.jpg" alt="第三則活動廣告">
+    </a>
+
+  </div>
+
+  <!-- 下方三個圓點 -->
+  <div class="ad-dots" aria-label="選擇廣告">
+    <button class="ad-dot is-active" type="button" data-ad-index="0" aria-label="顯示第一則廣告"></button>
+    <button class="ad-dot" type="button" data-ad-index="1" aria-label="顯示第二則廣告"></button>
+    <button class="ad-dot" type="button" data-ad-index="2" aria-label="顯示第三則廣告"></button>
+  </div>
+</section>
+    <section class="desktop-shortcuts" id="desktopShortcuts" aria-label="系統捷徑"></section>
+    <p class="desktop-note"></p>
+  </main>
+
+  <section class="school-dialog" id="schoolDialog" aria-hidden="true">
+    <div class="school-dialog-card" role="dialog" aria-modal="true" aria-labelledby="schoolDialogTitle">
+      <div class="school-dialog-top">
+        <div>
+          <h2 class="school-dialog-title" id="schoolDialogTitle">選擇校區</h2>
+          <p class="school-dialog-copy">選擇後將直接在新分頁開啟校務系統。</p>
+        </div>
+        <button class="dialog-close" id="schoolDialogClose" type="button" aria-label="關閉校區選擇">×</button>
+      </div>
+
+      <select class="school-select" id="schoolSelect" aria-label="選擇校區">
+        <option value="" selected disabled>請選擇一個校區</option>
+      </select>
+      <p class="school-help">若尚未選擇校區，視窗不會跳轉。</p>
+    </div>
+  </section>
+
+  <script>
+    /*
+      系統順序依照原網站：3、3、3、2。
+      未來要改名稱、網址、圖片或順序，只修改 systems 即可。
+    */
+    const systems = [
+      {
+        title: "人事系統",
+        subtitle: "104 Enterprise Portal",
+        url: "http://hr.gram.com.tw/ehrportal/",
+        imageUrl: "images/icon-01.png"
+      },
+      {
+        title: "格蘭冒險島",
+        subtitle: "Gram Island",
+        url: "http://gramisland.gram1980.com/E-LearningWeb/",
+        imageUrl: "images/icon-02.png"
+      },
+      {
+        title: "格蘭冒險島管理後台",
+        subtitle: "Gram E-Learning",
+        url: "http://gramisland.gram1980.com/E-Learning/index",
+        imageUrl: "images/icon-03.png"
+      },
+      {
+        title: "企業快手",
+        subtitle: "Cloud HeadQuarter",
+        url: "https://merp.gram.com.tw/",
+        imageUrl: "images/icon-04.png"
+      },
+      {
+        title: "格蘭校務系統",
+        subtitle: "Gram ERP Management",
+        type: "school",
+        imageUrl: "images/icon-19.png"
+      },
+      {
+        title: "電子信箱",
+        subtitle: "Enterprise Mailbox",
+        url: "https://tritonb.url.com.tw/rcmail/",
+        imageUrl: "images/icon-06.png"
+      },
+      {
+        title: "線上教學平台（教師用）",
+        subtitle: "Gram E-Teaching",
+        url: "https://eschool.gram1980.com",
+        imageUrl: "images/icon-07.png"
+      },
+      {
+        title: "線上英語口說平台",
+        subtitle: "Online English Oral Practice",
+        url: "https://coeop.caves.com.tw/login/gram/",
+        imageUrl: "images/icon-09.png"
+      },
+      {
+        title: "線上音檔平台",
+        subtitle: "Gram Audio",
+        url: "https://audio.gram1980.com/MusicCenter/",
+        imageUrl: "images/icon-10.png"
+      },
+      {
+        title: "Kintone 平台",
+        subtitle: "Kintone System",
+        url: "https://gram.cybozu.com/",
+        imageUrl: "images/icon-12.png"
+      },
+      {
+        title: "各項資源下載區",
+        subtitle: "User Guide · Downloads · Monitors",
+        url: "E_index.htm",
+        target: "mainFrame",
+        imageUrl: "images/icon-05.png"
+      }
+    ];
+
+    const schools = [
+      ["基隆本校", "https://gramkl.mido-9.com/metronic/index.php"],
+      ["深美本校", "https://gramk2.mido-9.com/metronic/index.php"],
+      ["新店本校", "https://gramsd.mido-9.com/metronic/index.php"],
+      ["中和本校", "https://gramjh.mido-9.com/metronic/index.php"],
+      ["樹林本校", "https://gramsl.mido-9.com/metronic/index.php"],
+      ["太平本校", "https://gramtp.mido-9.com/metronic/index.php"],
+      ["中港本校", "https://gramck.mido-9.com/metronic/index.php"],
+      ["文心本校", "https://gramws.mido-9.com/metronic/index.php"],
+      ["斗六本校", "https://gramdl.mido-9.com/metronic/index.php"],
+      ["虎尾本校", "https://gramhp.mido-9.com/metronic/index.php"],
+      ["林森本校", "https://gramh2.mido-9.com/metronic/index.php"],
+      ["忠明南校", "https://gramcm.mido-9.com/metronic/index.php"],
+      ["泰山分校", "https://gramts.mido-9.com/metronic/index.php"],
+      ["板橋沙崙", "https://gramsl2.mido-9.com/metronic/index.php"],
+      ["總管理部", "https://gramit.mido-9.com/metronic/index.php"]
+    ];
+
+    const desktopShortcuts = document.getElementById("desktopShortcuts");
+    const schoolDialog = document.getElementById("schoolDialog");
+    const schoolDialogClose = document.getElementById("schoolDialogClose");
+    const schoolSelect = document.getElementById("schoolSelect");
+
+    function createShortcuts() {
+      systems.forEach((system, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "shortcut";
+        button.dataset.index = index;
+        button.setAttribute("aria-label", `開啟${system.title}`);
+
+        button.innerHTML = `
+          <span class="shortcut-image" aria-hidden="true">
+            <img src="${system.imageUrl}" alt="">
+          </span>
+          <span class="shortcut-title">${system.title}</span>
+          <span class="shortcut-subtitle">${system.subtitle}</span>
+        `;
+
+        button.addEventListener("click", () => openSystem(index));
+        desktopShortcuts.appendChild(button);
+      });
+    }
+
+    function createSchoolOptions() {
+      schools.forEach(([name, url]) => {
+        const option = document.createElement("option");
+        option.value = url;
+        option.textContent = name;
+        schoolSelect.appendChild(option);
+      });
+    }
+
+    function openSystem(index) {
+      const system = systems[index];
+
+      if (system.type === "school") {
+        openSchoolDialog();
+        return;
+      }
+
+      if (!system.url) return;
+
+      if (system.target === "mainFrame") {
+        window.open(system.url, "mainFrame");
+      } else {
+        window.open(system.url, "_blank", "noopener");
+      }
+    }
+
+    function openSchoolDialog() {
+      schoolDialog.classList.add("is-open");
+      schoolDialog.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => schoolSelect.focus(), 80);
+    }
+
+    function closeSchoolDialog() {
+      schoolDialog.classList.remove("is-open");
+      schoolDialog.setAttribute("aria-hidden", "true");
+      schoolSelect.selectedIndex = 0;
+      desktopShortcuts.querySelector('[data-index="4"]')?.focus();
+    }
+
+    schoolDialogClose.addEventListener("click", closeSchoolDialog);
+
+    schoolDialog.addEventListener("click", event => {
+      if (event.target === schoolDialog) closeSchoolDialog();
+    });
+
+    schoolSelect.addEventListener("change", () => {
+      if (!schoolSelect.value) return;
+      window.open(schoolSelect.value, "_blank", "noopener");
+      closeSchoolDialog();
+    });
+
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape" && schoolDialog.classList.contains("is-open")) {
+        closeSchoolDialog();
+      }
+    });
+    /* ============================================================
+   廣告輪播：自動播放＋滑鼠／手指左右拖曳
+   ============================================================ */
+const adCarousel = document.getElementById("adCarousel");
+const adViewport = adCarousel.querySelector(".ad-viewport");
+const adSlides = [...adCarousel.querySelectorAll(".ad-slide")];
+const adDots = [...adCarousel.querySelectorAll(".ad-dot")];
+
+/* 每張廣告停留時間：5000 = 5 秒 */
+const AD_INTERVAL = 5000;
+
+/* 切換動畫速度：650 = 0.65 秒 */
+const AD_DURATION = 650;
+
+/* 拖曳超過容器寬度的 15%，才會正式換頁 */
+const DRAG_THRESHOLD = 0.15;
+
+let currentAdIndex = 0;
+let adTimer = null;
+let adIsAnimating = false;
+
+let isDragging = false;
+let startX = 0;
+let currentX = 0;
+let dragDistance = 0;
+let activePointerId = null;
+let hasDragged = false;
+
+/* 取得循環後的圖片索引 */
+function normalizeAdIndex(index) {
+  return (index + adSlides.length) % adSlides.length;
+}
+
+/* 更新下方圓點 */
+function updateAdDots() {
+  adDots.forEach((dot, index) => {
+    dot.classList.toggle("is-active", index === currentAdIndex);
+  });
+}
+
+/* 清除圖片上的暫時樣式 */
+function resetSlideStyles(slide) {
+  slide.style.transition = "";
+  slide.style.transform = "";
+  slide.style.opacity = "";
+  slide.style.visibility = "";
+  slide.style.pointerEvents = "";
+  slide.style.zIndex = "";
+}
+
+/* 正式切換圖片 */
+function showAd(nextIndex, direction = 1) {
+  nextIndex = normalizeAdIndex(nextIndex);
+
+  if (
+    adIsAnimating ||
+    nextIndex === currentAdIndex ||
+    !adSlides[nextIndex]
+  ) {
+    return;
+  }
+
+  adIsAnimating = true;
+
+  const currentSlide = adSlides[currentAdIndex];
+  const nextSlide = adSlides[nextIndex];
+
+  /*
+    direction = 1：
+    顯示下一張，新圖片從右側進入。
+
+    direction = -1：
+    顯示上一張，新圖片從左側進入。
+  */
+  const nextStartX = direction === 1 ? 100 : -100;
+  const currentEndX = direction === 1 ? -100 : 100;
+
+  nextSlide.style.visibility = "visible";
+  nextSlide.style.opacity = "1";
+  nextSlide.style.pointerEvents = "auto";
+  nextSlide.style.zIndex = "2";
+  nextSlide.style.transform = `translateX(${nextStartX}%)`;
+
+  currentSlide.style.visibility = "visible";
+  currentSlide.style.opacity = "1";
+  currentSlide.style.zIndex = "1";
+  currentSlide.style.transform = "translateX(0)";
+
+  const currentAnimation = currentSlide.animate(
+    [
+      { transform: "translateX(0)" },
+      { transform: `translateX(${currentEndX}%)` }
+    ],
+    {
+      duration: AD_DURATION,
+      easing: "cubic-bezier(.72, 0, .20, 1)",
+      fill: "forwards"
+    }
+  );
+
+  const nextAnimation = nextSlide.animate(
+    [
+      { transform: `translateX(${nextStartX}%)` },
+      { transform: "translateX(0)" }
+    ],
+    {
+      duration: AD_DURATION,
+      easing: "cubic-bezier(.72, 0, .20, 1)",
+      fill: "forwards"
+    }
+  );
+
+  nextAnimation.addEventListener(
+    "finish",
+    () => {
+      currentAnimation.cancel();
+      nextAnimation.cancel();
+
+      currentSlide.classList.remove("is-active");
+      nextSlide.classList.add("is-active");
+
+      resetSlideStyles(currentSlide);
+      resetSlideStyles(nextSlide);
+
+      currentAdIndex = nextIndex;
+      updateAdDots();
+
+      adIsAnimating = false;
+    },
+    { once: true }
+  );
+}
+
+/* 顯示下一張 */
+function showNextAd() {
+  showAd(currentAdIndex + 1, 1);
+}
+
+/* 顯示上一張 */
+function showPreviousAd() {
+  showAd(currentAdIndex - 1, -1);
+}
+
+/* 開始自動播放 */
+function startAdTimer() {
+  stopAdTimer();
+
+  adTimer = window.setInterval(() => {
+    if (!isDragging && !adIsAnimating) {
+      showNextAd();
+    }
+  }, AD_INTERVAL);
+}
+
+/* 停止自動播放 */
+function stopAdTimer() {
+  if (adTimer !== null) {
+    window.clearInterval(adTimer);
+    adTimer = null;
+  }
+}
+
+/* ============================================================
+   開始拖曳
+   ============================================================ */
+function startDrag(event) {
+  if (adIsAnimating) return;
+
+  isDragging = true;
+  hasDragged = false;
+
+  activePointerId = event.pointerId;
+  startX = event.clientX;
+  currentX = event.clientX;
+  dragDistance = 0;
+
+  stopAdTimer();
+
+  adViewport.setPointerCapture(activePointerId);
+  adCarousel.classList.add("is-dragging");
+
+  const currentSlide = adSlides[currentAdIndex];
+  const previousSlide = adSlides[
+    normalizeAdIndex(currentAdIndex - 1)
+  ];
+  const nextSlide = adSlides[
+    normalizeAdIndex(currentAdIndex + 1)
+  ];
+
+  [currentSlide, previousSlide, nextSlide].forEach(slide => {
+    slide.style.transition = "none";
+    slide.style.visibility = "visible";
+    slide.style.opacity = "1";
+    slide.style.pointerEvents = "none";
+  });
+
+  currentSlide.style.zIndex = "3";
+  currentSlide.style.transform = "translateX(0)";
+
+  previousSlide.style.zIndex = "2";
+  previousSlide.style.transform = "translateX(-100%)";
+
+  nextSlide.style.zIndex = "2";
+  nextSlide.style.transform = "translateX(100%)";
+}
+
+/* ============================================================
+   拖曳中
+   ============================================================ */
+function moveDrag(event) {
+  if (
+    !isDragging ||
+    event.pointerId !== activePointerId
+  ) {
+    return;
+  }
+
+  currentX = event.clientX;
+  dragDistance = currentX - startX;
+
+  if (Math.abs(dragDistance) > 6) {
+    hasDragged = true;
+  }
+
+  const width = adViewport.clientWidth;
+  const dragPercent = (dragDistance / width) * 100;
+
+  const currentSlide = adSlides[currentAdIndex];
+  const previousSlide = adSlides[
+    normalizeAdIndex(currentAdIndex - 1)
+  ];
+  const nextSlide = adSlides[
+    normalizeAdIndex(currentAdIndex + 1)
+  ];
+
+  currentSlide.style.transform =
+    `translateX(${dragPercent}%)`;
+
+  previousSlide.style.transform =
+    `translateX(${dragPercent - 100}%)`;
+
+  nextSlide.style.transform =
+    `translateX(${dragPercent + 100}%)`;
+}
+
+/* ============================================================
+   結束拖曳
+   ============================================================ */
+function endDrag(event) {
+  if (
+    !isDragging ||
+    event.pointerId !== activePointerId
+  ) {
+    return;
+  }
+
+  isDragging = false;
+  adCarousel.classList.remove("is-dragging");
+
+  const width = adViewport.clientWidth;
+  const threshold = width * DRAG_THRESHOLD;
+
+  const currentSlide = adSlides[currentAdIndex];
+  const previousIndex = normalizeAdIndex(currentAdIndex - 1);
+  const nextIndex = normalizeAdIndex(currentAdIndex + 1);
+
+  const previousSlide = adSlides[previousIndex];
+  const nextSlide = adSlides[nextIndex];
+
+  const animationOptions = {
+    duration: 360,
+    easing: "cubic-bezier(.22, .8, .25, 1)",
+    fill: "forwards"
+  };
+
+  /*
+    往左拖超過門檻：顯示下一張
+  */
+  if (dragDistance < -threshold) {
+    adIsAnimating = true;
+
+    const currentAnimation = currentSlide.animate(
+      [
+        { transform: currentSlide.style.transform },
+        { transform: "translateX(-100%)" }
+      ],
+      animationOptions
+    );
+
+    const nextAnimation = nextSlide.animate(
+      [
+        { transform: nextSlide.style.transform },
+        { transform: "translateX(0)" }
+      ],
+      animationOptions
+    );
+
+    nextAnimation.addEventListener(
+      "finish",
+      () => {
+        currentAnimation.cancel();
+        nextAnimation.cancel();
+
+        currentSlide.classList.remove("is-active");
+        nextSlide.classList.add("is-active");
+
+        [currentSlide, previousSlide, nextSlide].forEach(
+          resetSlideStyles
+        );
+
+        currentAdIndex = nextIndex;
+        updateAdDots();
+
+        adIsAnimating = false;
+        startAdTimer();
+      },
+      { once: true }
+    );
+  }
+
+  /*
+    往右拖超過門檻：顯示上一張
+  */
+  else if (dragDistance > threshold) {
+    adIsAnimating = true;
+
+    const currentAnimation = currentSlide.animate(
+      [
+        { transform: currentSlide.style.transform },
+        { transform: "translateX(100%)" }
+      ],
+      animationOptions
+    );
+
+    const previousAnimation = previousSlide.animate(
+      [
+        { transform: previousSlide.style.transform },
+        { transform: "translateX(0)" }
+      ],
+      animationOptions
+    );
+
+    previousAnimation.addEventListener(
+      "finish",
+      () => {
+        currentAnimation.cancel();
+        previousAnimation.cancel();
+
+        currentSlide.classList.remove("is-active");
+        previousSlide.classList.add("is-active");
+
+        [currentSlide, previousSlide, nextSlide].forEach(
+          resetSlideStyles
+        );
+
+        currentAdIndex = previousIndex;
+        updateAdDots();
+
+        adIsAnimating = false;
+        startAdTimer();
+      },
+      { once: true }
+    );
+  }
+
+  /*
+    拖曳距離不夠：彈回目前圖片
+  */
+  else {
+    const currentAnimation = currentSlide.animate(
+      [
+        { transform: currentSlide.style.transform },
+        { transform: "translateX(0)" }
+      ],
+      animationOptions
+    );
+
+    const previousAnimation = previousSlide.animate(
+      [
+        { transform: previousSlide.style.transform },
+        { transform: "translateX(-100%)" }
+      ],
+      animationOptions
+    );
+
+    const nextAnimation = nextSlide.animate(
+      [
+        { transform: nextSlide.style.transform },
+        { transform: "translateX(100%)" }
+      ],
+      animationOptions
+    );
+
+    currentAnimation.addEventListener(
+      "finish",
+      () => {
+        currentAnimation.cancel();
+        previousAnimation.cancel();
+        nextAnimation.cancel();
+
+        [currentSlide, previousSlide, nextSlide].forEach(
+          resetSlideStyles
+        );
+
+        startAdTimer();
+      },
+      { once: true }
+    );
+  }
+
+  activePointerId = null;
+}
+
+/* 滑鼠與觸控事件 */
+adViewport.addEventListener("pointerdown", startDrag);
+adViewport.addEventListener("pointermove", moveDrag);
+adViewport.addEventListener("pointerup", endDrag);
+adViewport.addEventListener("pointercancel", endDrag);
+
+/*
+  拖曳後阻止廣告連結被誤點。
+  一般點擊仍可正常開啟連結。
+*/
+adSlides.forEach(slide => {
+  slide.addEventListener("click", event => {
+    if (hasDragged) {
+      event.preventDefault();
+      event.stopPropagation();
+      hasDragged = false;
+    }
+  });
+});
+
+/* 點擊圓點切換 */
+adDots.forEach(dot => {
+  dot.addEventListener("click", () => {
+    const nextIndex = Number(dot.dataset.adIndex);
+
+    if (nextIndex === currentAdIndex) return;
+
+    const direction =
+      nextIndex > currentAdIndex ? 1 : -1;
+
+    showAd(nextIndex, direction);
+    startAdTimer();
+  });
+});
+
+/* 滑鼠停在廣告區時暫停自動輪播 */
+adCarousel.addEventListener("pointerenter", stopAdTimer);
+
+adCarousel.addEventListener("pointerleave", () => {
+  if (!isDragging) {
+    startAdTimer();
+  }
+});
+
+/* 啟動自動輪播 */
+startAdTimer();
+    createShortcuts();
+    createSchoolOptions();
+  </script>
+</body>
+</html>
