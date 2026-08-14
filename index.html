@@ -20,12 +20,15 @@
 
     html, body {
       width: 100%;
-      height: 100%;
+      min-height: 100%;
       margin: 0;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
 
     body {
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       color: #fff;
       background: var(--gram-navy);
       font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
@@ -33,19 +36,24 @@
 
     button, select { font: inherit; }
 
-    /* 固定桌布，不切換、不滑動 */
+    /* 整頁可捲動，桌布固定在視窗後方 */
     .desktop {
       position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+      width: 100%;
+      min-height: 100vh;
+      padding:
+        clamp(110px, 12vh, 140px)
+        clamp(16px, 4vw, 48px)
+        clamp(48px, 7vh, 80px);
+      overflow: visible;
       background:
         linear-gradient(rgba(2, 9, 20, .18), rgba(2, 9, 20, .18)),
         var(--desktop-wallpaper) center / cover no-repeat;
+      background-attachment: fixed;
     }
 
     .top-brand {
-      position: fixed;
+      position: absolute;
       top: 26px;
       left: 38px;
       z-index: 10;
@@ -95,7 +103,7 @@
        右上角 Facebook／YouTube 超連結
        ============================================================ */
     .social-links {
-        position: fixed;
+        position: absolute;
         top: 26px;       /* 越大越往下 */
         right: 38px;     /* 越大越往左 */
         z-index: 10;
@@ -136,17 +144,19 @@
    首頁廣告輪播區
    ============================================================ */
 .ad-carousel {
-  position: absolute;
+  position: relative;
 
-  /* ★ 廣告欄上下左右位置 */
-  top: 120px;       /* 數字越大越往下 */
-  left: 50%;       /* 數字越大越往右 */
+  /* ★ 廣告欄位置與下方功能區距離 */
+  top: auto;
+  left: auto;
 
   z-index: 6;
-transform: translateX(-50%);
+  margin: 0 auto 64px;
+  transform: none;
   /* ★ 廣告欄大小 */
-  width: 686px;
-  height: 180px;
+  width: min(686px, 100%);
+  height: auto;
+  aspect-ratio: 686 / 180;
 
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, .30);
@@ -247,38 +257,23 @@ transform: translateX(-50%);
     /* ============================================================
        11 個桌面捷徑：3、3、3、2
 
-       捲動功能保留，但把右側／旁邊的捲軸外觀隱藏：
-       - 滑鼠滾輪仍可使用
-       - 觸控板仍可使用
-       - 手機觸控滑動仍可使用
+       功能捷徑不再使用獨立捲動區，改由整個頁面捲動。
+       因此滑鼠停在背景、廣告、標題或按鈕上都能捲動。
        ============================================================ */
     .desktop-shortcuts {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translateX(-50%);
+      position: relative;
+      top: auto;
+      left: auto;
+      transform: none;
       z-index: 5;
       display: grid;
-      grid-template-columns: repeat(3, 210px);
-      gap: 24px 28px;
-      max-height: calc(100vh - 125px);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(16px, 2vw, 24px) clamp(18px, 2.4vw, 28px);
+      width: min(706px, 100%);
+      max-height: none;
+      margin: 0 auto;
       padding: 8px 12px 28px 8px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-
-      /* Firefox：隱藏捲軸，但保留捲動 */
-      scrollbar-width: none;
-
-      /* 舊版 Edge／IE：隱藏捲軸，但保留捲動 */
-      -ms-overflow-style: none;
-    }
-
-    /* Chrome／Edge／Safari：隱藏捲軸，但保留捲動 */
-    .desktop-shortcuts::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-      display: none;
+      overflow: visible;
     }
 
     .shortcut {
@@ -286,7 +281,8 @@ transform: translateX(-50%);
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      width: 210px;
+      width: 100%;
+      min-width: 0;
       min-height: 175px;
       padding: 12px 10px 14px;
       border: 1px solid transparent;
@@ -313,8 +309,9 @@ transform: translateX(-50%);
     .shortcut-image {
       display: grid;
       place-items: center;
-      width: 190px;
-      height: 110px;
+      width: min(190px, 100%);
+      height: auto;
+      aspect-ratio: 19 / 11;
       margin-bottom: 7px;
       overflow: hidden;
       border-radius: 5px;
@@ -332,7 +329,7 @@ transform: translateX(-50%);
     .shortcut-title {
       display: block;
       width: 100%;
-      font-size: 20px;
+      font-size: clamp(17px, 1.5vw, 20px);
       font-weight: 800;
       line-height: 1.35;
       word-break: break-word;
@@ -453,13 +450,13 @@ transform: translateX(-50%);
       font-size: 11px;
     }
 
-    @media (max-width: 760px) {
-      body { overflow: auto; }
-
+    /* 平板與手機：改為雙欄，所有區塊依螢幕寬度縮放 */
+    @media (max-width: 900px) {
       .desktop {
         min-height: 100vh;
-        height: auto;
+        padding: 0 0 36px;
         overflow: visible;
+        background-attachment: scroll;
       }
 
       .top-brand {
@@ -480,6 +477,17 @@ transform: translateX(-50%);
         font-size: 12px;
       }
 
+      .ad-carousel {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: calc(100% - 36px);
+        height: auto;
+        aspect-ratio: 686 / 180;
+        margin: 18px auto 10px;
+        transform: none;
+      }
+
       .desktop-shortcuts {
         position: relative;
         top: auto;
@@ -488,6 +496,7 @@ transform: translateX(-50%);
         gap: 12px;
         width: 100%;
         max-height: none;
+        margin: 0;
         padding: 18px;
         overflow: visible;
       }
@@ -498,14 +507,34 @@ transform: translateX(-50%);
       }
 
       .shortcut-image {
-        width: min(138px, 100%);
+        width: min(160px, 100%);
       }
 
       .desktop-note { display: none; }
     }
 
+    /* 小尺寸手機：改為單欄，避免按鈕與文字過度擁擠 */
     @media (max-width: 420px) {
       .desktop-shortcuts { grid-template-columns: 1fr; }
+
+      .top-brand {
+        padding-right: 112px;
+      }
+
+      .social-links {
+        right: 12px;
+        gap: 7px;
+      }
+
+      .social-link {
+        width: 36px;
+        height: 36px;
+        padding: 7px;
+      }
+
+      .shortcut-title {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
